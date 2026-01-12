@@ -2,7 +2,7 @@ import json
 from datetime import datetime
 
 # Load data
-with open("data.json", "r", encoding="utf-8") as f:
+with open("gold_rates.json", "r", encoding="utf-8") as f:
     data = json.load(f)[0]
 
 # Use today's date automatically

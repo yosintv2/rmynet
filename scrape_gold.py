@@ -3,53 +3,61 @@ from bs4 import BeautifulSoup
 import json
 import os
 
-# Create folder if it doesn't exist
 folder = 'data'
 if not os.path.exists(folder):
     os.makedirs(folder)
 
 url = "https://www.hamropatro.com/gold"
-# Adding a common User-Agent to avoid being blocked by the server
+# A more realistic User-Agent to look like a real browser
 headers = {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    'Accept-Language': 'en-US,en;q=0.9'
 }
 
 try:
     response = requests.get(url, headers=headers)
-    response.raise_for_status() # Check if the request was successful
     soup = BeautifulSoup(response.text, 'html.parser')
 
-    # Targeted selection: Hamro Patro uses 'column-left' or specific classes for the gold section
-    # Let's try to find the date more reliably
-    date_element = soup.find('div', class_='currDate')
-    date_info = date_element.text.strip() if date_element else "Date Not Found"
+    # 1. Try to find the date
+    # Method A: Look for the 'currDate' class
+    # Method B: Look for the 'header' or 'title' if A fails
+    date_section = soup.find('div', class_='currDate')
+    if date_section:
+        date_info = date_section.get_text(strip=True)
+    else:
+        # Fallback: Try to find any heading that looks like a date
+        date_info = soup.select_one('section.repro_card h2')
+        date_info = date_info.get_text(strip=True) if date_info else "Date Not Found"
 
-    # Find the gold/silver list
-    # The structure is usually an unordered list <ul> inside the gold-silver container
-    gold_items = soup.select('ul.gold-silver-rate li')
-
+    # 2. Extract Rates
+    # On Hamro Patro, rates are usually in a list <li> inside a specific <ul>
     rates = {}
-    for item in gold_items:
-        try:
-            name = item.find('span', class_='text').text.strip()
-            price = item.find('span', class_='rate').text.strip()
-            rates[name] = price
-        except AttributeError:
-            continue
+    # We look for the specific container for gold/silver
+    items = soup.select('ul.gold-silver-rate li')
 
-    extracted_data = {
+    for item in items:
+        name_tag = item.find('span', class_='text')
+        rate_tag = item.find('span', class_='rate')
+        
+        if name_tag and rate_tag:
+            name = name_tag.get_text(strip=True)
+            price = rate_tag.get_text(strip=True)
+            rates[name] = price
+
+    # Create the JSON structure
+    output = {
         "full_date_string": date_info,
         "rates": rates
     }
 
     # Save to data/date.json
-    file_path = os.path.join(folder, 'date.json')
-    with open(file_path, 'w', encoding='utf-8') as f:
-        json.dump(extracted_data, f, ensure_ascii=False, indent=4)
+    with open(os.path.join(folder, 'date.json'), 'w', encoding='utf-8') as f:
+        json.dump(output, f, ensure_ascii=False, indent=4)
 
-    print(f"Successfully saved data to {file_path}")
+    # Debugging print to see what was found in the GitHub logs
+    print(f"Scraped Date: {date_info}")
+    print(f"Found {len(rates)} rate entries.")
 
 except Exception as e:
-    print(f"An error occurred: {e}")
-    # Create an empty/error file so the workflow doesn't just fail silently
+    print(f"Error: {e}")
     exit(1)

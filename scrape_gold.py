@@ -1,54 +1,66 @@
+import requests
+from bs4 import BeautifulSoup
 import json
 import os
-from playwright.sync_api import sync_playwright
+import re
 
 def scrape():
+    # Ensure data folder exists
     folder = 'data'
     if not os.path.exists(folder):
         os.makedirs(folder)
 
-    with sync_playwright() as p:
-        # Launching Chromium
-        browser = p.chromium.launch(headless=True)
-        context = browser.new_context(user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
-        page = context.new_page()
+    url = "https://www.ashesh.com.np/gold/widget.php?api=820174j460"
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+    }
+
+    try:
+        response = requests.get(url, headers=headers)
+        soup = BeautifulSoup(response.text, 'html.parser')
+
+        # 1. Extract Date
+        # The date is usually in a div or span. We look for the DD-Mon-YYYY pattern.
+        date_text = soup.get_text()
+        date_match = re.search(r'(\d{1,2}-[A-Za-z]+-\d{4})', date_text)
+        date_info = date_match.group(1) if date_match else "Date Not Found"
+
+        # 2. Extract Gold/Silver Rates
+        rates = []
+        # The widget uses a table. We find all rows <tr>
+        rows = soup.find_all('tr')
         
-        try:
-            # Go to Hamro Patro Gold page
-            page.goto("https://www.hamropatro.com/gold", wait_until="networkidle", timeout=60000)
-            
-            # Wait for the date element to appear
-            page.wait_for_selector('.currDate')
-
-            # Extract Data
-            date_info = page.locator('.currDate').inner_text()
-            
-            rates = {}
-            # Target the list items specifically
-            items = page.locator('ul.gold-silver-rate li').all()
-            
-            for item in items:
-                name = item.locator('.text').inner_text()
-                price = item.locator('.rate').inner_text()
-                if name and price:
-                    rates[name.strip()] = price.strip()
-
-            output = {
-                "full_date_string": date_info.strip(),
-                "rates": rates
-            }
-
-            # Save JSON
-            file_path = os.path.join(folder, 'date.json')
-            with open(file_path, 'w', encoding='utf-8') as f:
-                json.dump(output, f, ensure_ascii=False, indent=4)
+        for row in rows:
+            cols = row.find_all('td')
+            # Look for rows that have data (usually 3 or more columns)
+            if len(cols) >= 3:
+                item_name = cols[0].get_text(strip=True).replace('▶', '')
+                price = cols[1].get_text(strip=True)
+                unit = cols[2].get_text(strip=True)
                 
-            print(f"Successfully scraped: {date_info}")
+                # Filter out header rows like "Items", "Unit", "Price"
+                if "Price" not in price and price:
+                    rates.append({
+                        "item": item_name,
+                        "price": price,
+                        "unit": unit
+                    })
 
-        except Exception as e:
-            print(f"Error during scraping: {e}")
-        finally:
-            browser.close()
+        output = {
+            "full_date_string": date_info,
+            "data": rates
+        }
+
+        # Save to data/date.json
+        file_path = os.path.join(folder, 'date.json')
+        with open(file_path, 'w', encoding='utf-8') as f:
+            json.dump(output, f, ensure_ascii=False, indent=4)
+            
+        print(f"Scraped successfully for date: {date_info}")
+
+    except Exception as e:
+        print(f"Error: {e}")
+        exit(1)
 
 if __name__ == "__main__":
     scrape()

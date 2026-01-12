@@ -1,36 +1,31 @@
-name: Auto Build Weight Loss Pages
+name: Auto Build Pages
 
 on:
+  push:
+    branches: [ "main" ]
   schedule:
-    # Run on the 1st of every month
-    - cron: '0 0 1 * *'
-
-    # Run once every year on Jan 1
-    - cron: '0 0 1 1 *'
-
-  workflow_dispatch:   # Manual run button
-
-permissions:
-  contents: write
+    - cron: "0 0 1 * *"   # runs monthly
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.x'
 
-      - name: Run build script
-        run: |
-          python build.py
+      - name: Generate site
+        run: python build.py
 
-      - name: Commit & Push generated pages
+      - name: Commit generated pages
         run: |
-          git config --global user.name "seo-bot"
-          git config --global user.email "seo-bot@users.noreply.github.com"
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add -A
+          git commit -m "Auto-generate weight loss pages" || echo "No changes"
+          git push

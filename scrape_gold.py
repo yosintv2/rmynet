@@ -8,41 +8,47 @@ def scrape():
         os.makedirs(folder)
 
     with sync_playwright() as p:
-        # Launch browser
+        # Launching Chromium
         browser = p.chromium.launch(headless=True)
-        page = browser.new_page()
+        context = browser.new_context(user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+        page = context.new_page()
         
-        # Navigate to URL
-        url = "https://www.hamropatro.com/gold"
-        page.goto(url, wait_until="networkidle")
+        try:
+            # Go to Hamro Patro Gold page
+            page.goto("https://www.hamropatro.com/gold", wait_until="networkidle", timeout=60000)
+            
+            # Wait for the date element to appear
+            page.wait_for_selector('.currDate')
 
-        # 1. Extract Date
-        # Trying common selectors for the date container
-        date_info = page.locator('.currDate').inner_text() or "Date Not Found"
+            # Extract Data
+            date_info = page.locator('.currDate').inner_text()
+            
+            rates = {}
+            # Target the list items specifically
+            items = page.locator('ul.gold-silver-rate li').all()
+            
+            for item in items:
+                name = item.locator('.text').inner_text()
+                price = item.locator('.rate').inner_text()
+                if name and price:
+                    rates[name.strip()] = price.strip()
 
-        # 2. Extract Rates
-        rates = {}
-        # Find the list items in the gold rate section
-        items = page.locator('ul.gold-silver-rate li').all()
-        
-        for item in items:
-            name = item.locator('.text').inner_text()
-            price = item.locator('.rate').inner_text()
-            if name and price:
-                rates[name.strip()] = price.strip()
+            output = {
+                "full_date_string": date_info.strip(),
+                "rates": rates
+            }
 
-        # Build final JSON
-        output = {
-            "full_date_string": date_info.strip(),
-            "rates": rates
-        }
+            # Save JSON
+            file_path = os.path.join(folder, 'date.json')
+            with open(file_path, 'w', encoding='utf-8') as f:
+                json.dump(output, f, ensure_ascii=False, indent=4)
+                
+            print(f"Successfully scraped: {date_info}")
 
-        # Save to file
-        with open(os.path.join(folder, 'date.json'), 'w', encoding='utf-8') as f:
-            json.dump(output, f, ensure_ascii=False, indent=4)
-
-        browser.close()
-        print(f"Scraped Successfully: {date_info}")
+        except Exception as e:
+            print(f"Error during scraping: {e}")
+        finally:
+            browser.close()
 
 if __name__ == "__main__":
     scrape()

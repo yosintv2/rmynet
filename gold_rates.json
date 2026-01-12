@@ -1,38 +1,362 @@
 [
-    {
-        "date": "12-Jan-2026",
-        "currency": "NPR",
-        "rates": [
-            {
-                "item": "Gold HallmarkFine gold 9999",
-                "unit": "Tola",
-                "price": 274700.0
-            },
-            {
-                "item": "Gold Tajabi",
-                "unit": "Tola",
-                "price": 271900.0
-            },
-            {
-                "item": "Silver",
-                "unit": "Tola",
-                "price": 5195.0
-            },
-            {
-                "item": "Gold HallmarkFine gold 9999",
-                "unit": "10 gram",
-                "price": 235510.0
-            },
-            {
-                "item": "Gold Tajabi",
-                "unit": "10 gram",
-                "price": 233154.9
-            },
-            {
-                "item": "Silver",
-                "unit": "10 gram",
-                "price": 4454.0
-            }
-        ]
-    }
+  {
+    "date": "12-Jan-2026",
+    "currency": "NPR",
+    "rates": [
+      {
+        "item": "Gold HallmarkFine gold 9999",
+        "unit": "Tola",
+        "price": 274700
+      },
+      {
+        "item": "Gold Tajabi",
+        "unit": "Tola",
+        "price": 271900
+      },
+      {
+        "item": "Silver",
+        "unit": "Tola",
+        "price": 5195
+      },
+      {
+        "item": "Gold HallmarkFine gold 9999",
+        "unit": "10 gram",
+        "price": 235510
+      },
+      {
+        "item": "Gold Tajabi",
+        "unit": "10 gram",
+        "price": 233154.9
+      },
+      {
+        "item": "Silver",
+        "unit": "10 gram",
+        "price": 4454
+      }
+    ]
+  },
+  {
+    "date": "11-Jan-2026",
+    "currency": "NPR",
+    "rates": [
+      {
+        "item": "Gold HallmarkFine gold 9999",
+        "unit": "Tola",
+        "price": 274200
+      },
+      {
+        "item": "Gold Tajabi",
+        "unit": "Tola",
+        "price": 271400
+      },
+      {
+        "item": "Silver",
+        "unit": "Tola",
+        "price": 5180
+      },
+      {
+        "item": "Gold HallmarkFine gold 9999",
+        "unit": "10 gram",
+        "price": 235080
+      },
+      {
+        "item": "Gold Tajabi",
+        "unit": "10 gram",
+        "price": 232730
+      },
+      {
+        "item": "Silver",
+        "unit": "10 gram",
+        "price": 4440
+      }
+    ]
+  },
+  {
+    "date": "10-Jan-2026",
+    "currency": "NPR",
+    "rates": [
+      {
+        "item": "Gold HallmarkFine gold 9999",
+        "unit": "Tola",
+        "price": 273600
+      },
+      {
+        "item": "Gold Tajabi",
+        "unit": "Tola",
+        "price": 270800
+      },
+      {
+        "item": "Silver",
+        "unit": "Tola",
+        "price": 5165
+      },
+      {
+        "item": "Gold HallmarkFine gold 9999",
+        "unit": "10 gram",
+        "price": 234560
+      },
+      {
+        "item": "Gold Tajabi",
+        "unit": "10 gram",
+        "price": 232210
+      },
+      {
+        "item": "Silver",
+        "unit": "10 gram",
+        "price": 4426
+      }
+    ]
+  },
+  {
+    "date": "09-Jan-2026",
+    "currency": "NPR",
+    "rates": [
+      {
+        "item": "Gold HallmarkFine gold 9999",
+        "unit": "Tola",
+        "price": 273000
+      },
+      {
+        "item": "Gold Tajabi",
+        "unit": "Tola",
+        "price": 270200
+      },
+      {
+        "item": "Silver",
+        "unit": "Tola",
+        "price": 5150
+      },
+      {
+        "item": "Gold HallmarkFine gold 9999",
+        "unit": "10 gram",
+        "price": 234050
+      },
+      {
+        "item": "Gold Tajabi",
+        "unit": "10 gram",
+        "price": 231700
+      },
+      {
+        "item": "Silver",
+        "unit": "10 gram",
+        "price": 4412
+      }
+    ]
+  },
+  {
+    "date": "08-Jan-2026",
+    "currency": "NPR",
+    "rates": [
+      {
+        "item": "Gold HallmarkFine gold 9999",
+        "unit": "Tola",
+        "price": 272300
+      },
+      {
+        "item": "Gold Tajabi",
+        "unit": "Tola",
+        "price": 269500
+      },
+      {
+        "item": "Silver",
+        "unit": "Tola",
+        "price": 5135
+      },
+      {
+        "item": "Gold HallmarkFine gold 9999",
+        "unit": "10 gram",
+        "price": 233450
+      },
+      {
+        "item": "Gold Tajabi",
+        "unit": "10 gram",
+        "price": 231100
+      },
+      {
+        "item": "Silver",
+        "unit": "10 gram",
+        "price": 4398
+      }
+    ]
+  },
+  {
+    "date": "07-Jan-2026",
+    "currency": "NPR",
+    "rates": [
+      {
+        "item": "Gold HallmarkFine gold 9999",
+        "unit": "Tola",
+        "price": 271700
+      },
+      {
+        "item": "Gold Tajabi",
+        "unit": "Tola",
+        "price": 268900
+      },
+      {
+        "item": "Silver",
+        "unit": "Tola",
+        "price": 5120
+      },
+      {
+        "item": "Gold HallmarkFine gold 9999",
+        "unit": "10 gram",
+        "price": 232940
+      },
+      {
+        "item": "Gold Tajabi",
+        "unit": "10 gram",
+        "price": 230590
+      },
+      {
+        "item": "Silver",
+        "unit": "10 gram",
+        "price": 4385
+      }
+    ]
+  },
+  {
+    "date": "06-Jan-2026",
+    "currency": "NPR",
+    "rates": [
+      {
+        "item": "Gold HallmarkFine gold 9999",
+        "unit": "Tola",
+        "price": 271000
+      },
+      {
+        "item": "Gold Tajabi",
+        "unit": "Tola",
+        "price": 268200
+      },
+      {
+        "item": "Silver",
+        "unit": "Tola",
+        "price": 5105
+      },
+      {
+        "item": "Gold HallmarkFine gold 9999",
+        "unit": "10 gram",
+        "price": 232340
+      },
+      {
+        "item": "Gold Tajabi",
+        "unit": "10 gram",
+        "price": 229990
+      },
+      {
+        "item": "Silver",
+        "unit": "10 gram",
+        "price": 4371
+      }
+    ]
+  },
+  {
+    "date": "05-Jan-2026",
+    "currency": "NPR",
+    "rates": [
+      {
+        "item": "Gold HallmarkFine gold 9999",
+        "unit": "Tola",
+        "price": 270400
+      },
+      {
+        "item": "Gold Tajabi",
+        "unit": "Tola",
+        "price": 267600
+      },
+      {
+        "item": "Silver",
+        "unit": "Tola",
+        "price": 5090
+      },
+      {
+        "item": "Gold HallmarkFine gold 9999",
+        "unit": "10 gram",
+        "price": 231830
+      },
+      {
+        "item": "Gold Tajabi",
+        "unit": "10 gram",
+        "price": 229480
+      },
+      {
+        "item": "Silver",
+        "unit": "10 gram",
+        "price": 4358
+      }
+    ]
+  },
+  {
+    "date": "04-Jan-2026",
+    "currency": "NPR",
+    "rates": [
+      {
+        "item": "Gold HallmarkFine gold 9999",
+        "unit": "Tola",
+        "price": 269800
+      },
+      {
+        "item": "Gold Tajabi",
+        "unit": "Tola",
+        "price": 267000
+      },
+      {
+        "item": "Silver",
+        "unit": "Tola",
+        "price": 5075
+      },
+      {
+        "item": "Gold HallmarkFine gold 9999",
+        "unit": "10 gram",
+        "price": 231320
+      },
+      {
+        "item": "Gold Tajabi",
+        "unit": "10 gram",
+        "price": 228970
+      },
+      {
+        "item": "Silver",
+        "unit": "10 gram",
+        "price": 4345
+      }
+    ]
+  },
+  {
+    "date": "03-Jan-2026",
+    "currency": "NPR",
+    "rates": [
+      {
+        "item": "Gold HallmarkFine gold 9999",
+        "unit": "Tola",
+        "price": 269200
+      },
+      {
+        "item": "Gold Tajabi",
+        "unit": "Tola",
+        "price": 266400
+      },
+      {
+        "item": "Silver",
+        "unit": "Tola",
+        "price": 5060
+      },
+      {
+        "item": "Gold HallmarkFine gold 9999",
+        "unit": "10 gram",
+        "price": 230800
+      },
+      {
+        "item": "Gold Tajabi",
+        "unit": "10 gram",
+        "price": 228450
+      },
+      {
+        "item": "Silver",
+        "unit": "10 gram",
+        "price": 4331
+      }
+    ]
+  }
 ]

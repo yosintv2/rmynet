@@ -1,32 +1,32 @@
-name: Ashesh Gold Scraper
+name: Daily Gold Rate Scraper
 
 on:
   schedule:
-    - cron: '0 6 * * *' # Runs at 11:45 AM NST (Daily Gold Update Time)
-  workflow_dispatch:
+    - cron: '0 6 * * *' # Runs daily at 06:00 UTC
+  workflow_dispatch: # Allows you to run it manually from the Actions tab
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
+      - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.9'
+          python-version: '3.10'
 
-      - name: Install Dependencies
+      - name: Install dependencies
         run: pip install requests beautifulsoup4
 
-      - name: Run Scraper
-        run: python scrape_gold.py
+      - name: Run scraper
+        run: python scraper.py
 
-      - name: Commit and Push
+      - name: Commit and push changes
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/date.json
-          git commit -m "Update Gold Rates: $(date)" || exit 0
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add gold_rates.json
+          git commit -m "Update gold rates for $(date +'%Y-%m-%d')" || exit 0
           git push

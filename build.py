@@ -4,8 +4,7 @@ from datetime import date
 # =========================
 # CONFIG
 # =========================
-SITE_PATH = "/rmynet"
-OUTPUT_DIR = "output"
+SITE_URL = "https://www.reducemyweight.net"
 
 MONTHS = [
     "January", "February", "March", "April", "May", "June",
@@ -15,8 +14,6 @@ MONTHS = [
 START_YEAR = date.today().year
 END_YEAR = START_YEAR + 5
 
-os.makedirs(OUTPUT_DIR, exist_ok=True)
-
 ALL_PAGES = []
 
 # =========================
@@ -24,13 +21,11 @@ ALL_PAGES = []
 # =========================
 def generate_page(month, year):
     slug = f"weight-loss-plan-{month.lower()}-{year}.html"
-    filepath = f"{OUTPUT_DIR}/{slug}"
 
     ALL_PAGES.append({
-        "title": f"{month} {year} Weight Loss Plan",
-        "slug": slug,
+        "month": month,
         "year": year,
-        "month": month
+        "slug": slug
     })
 
     html = f"""<!DOCTYPE html>
@@ -38,31 +33,54 @@ def generate_page(month, year):
 <head>
 <meta charset="UTF-8">
 <title>{month} {year} Weight Loss Plan</title>
+<meta name="description" content="Best weight loss plan for {month} {year}.">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="canonical" href="{SITE_URL}/{slug}">
+<script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body style="font-family: sans-serif; max-width: 800px; margin: auto;">
-<nav>
-  <a href="{SITE_PATH}/index.html">Home</a>
+<body class="bg-gray-100 text-gray-900">
+<div class="max-w-3xl mx-auto p-6">
+
+<nav class="mb-6">
+  <a href="/" class="text-blue-600 font-semibold">← Home</a>
 </nav>
 
-<h1>{month} {year} Weight Loss Plan</h1>
-<p>Simple and sustainable weight loss plan for {month} {year}.</p>
+<h1 class="text-3xl font-bold mb-4">{month} {year} Weight Loss Plan</h1>
 
-<footer>
-  <p>© ReduceMyWeight</p>
+<p class="mb-4">
+This monthly plan helps you lose weight safely using diet control and workouts.
+</p>
+
+<h2 class="text-xl font-semibold mt-6">Diet Plan</h2>
+<ul class="list-disc ml-6">
+  <li>High-protein foods</li>
+  <li>Low sugar intake</li>
+  <li>Seasonal vegetables</li>
+</ul>
+
+<h2 class="text-xl font-semibold mt-6">Workout Plan</h2>
+<ul class="list-disc ml-6">
+  <li>Walking – 30 minutes daily</li>
+  <li>Strength training – 3× per week</li>
+</ul>
+
+<footer class="mt-10 text-sm text-gray-500">
+© ReduceMyWeight
 </footer>
+
+</div>
 </body>
 </html>
 """
 
-    with open(filepath, "w", encoding="utf-8") as f:
+    with open(slug, "w", encoding="utf-8") as f:
         f.write(html)
 
-    print(f"📝 Generated: {filepath}")
+    print(f"📝 Generated: {slug}")
 
 # =========================
-# INDEX PAGE (ROOT)
+# INDEX PAGE
 # =========================
 def generate_index():
     pages_by_year = {}
@@ -71,47 +89,45 @@ def generate_index():
         pages_by_year.setdefault(p["year"], []).append(p)
 
     listing = ""
-
     for year in sorted(pages_by_year.keys(), reverse=True):
-        listing += f"<h2>{year}</h2><ul>"
+        listing += f"<h2 class='text-2xl font-bold mt-8'>{year}</h2>"
+        listing += "<div class='grid sm:grid-cols-2 gap-4 mt-4'>"
+
         for p in pages_by_year[year]:
             listing += f"""
-            <li>
-              <a href="{SITE_PATH}/output/{p['slug']}">
-                {p['month']} {p['year']} Weight Loss Plan
-              </a>
-            </li>
+            <a href="/{p['slug']}" class="block bg-white p-4 rounded shadow hover:shadow-lg transition">
+              <h3 class="font-semibold">{p['month']} {p['year']} Weight Loss Plan</h3>
+            </a>
             """
-        listing += "</ul>"
+
+        listing += "</div>"
 
     index_html = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <title>Reduce My Weight</title>
+<meta name="description" content="Automated monthly weight loss plans.">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-
-<!-- Tailwind -->
 <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
 <body class="bg-gray-100 text-gray-900">
-<div class="max-w-4xl mx-auto p-6">
+<div class="max-w-5xl mx-auto p-6">
 
-<header class="mb-8">
+<header class="mb-10">
   <h1 class="text-4xl font-bold">Reduce My Weight</h1>
   <p class="text-gray-600">Monthly Weight Loss Plans</p>
 
   <nav class="mt-4 space-x-4">
-    <a href="{SITE_PATH}/index.html" class="text-blue-600">Home</a>
-    <a href="{SITE_PATH}/sitemap.xml" class="text-blue-600">Sitemap</a>
+    <a href="/" class="text-blue-600 font-semibold">Home</a>
   </nav>
 </header>
 
 {listing}
 
-<footer class="mt-10 text-sm text-gray-500">
-  © ReduceMyWeight
+<footer class="mt-12 text-sm text-gray-500">
+© ReduceMyWeight
 </footer>
 
 </div>
@@ -122,7 +138,7 @@ def generate_index():
     with open("index.html", "w", encoding="utf-8") as f:
         f.write(index_html)
 
-    print("🏠 index.html written at ROOT")
+    print("🏠 index.html generated")
 
 # =========================
 # BUILD
@@ -135,4 +151,4 @@ for year in range(START_YEAR, END_YEAR + 1):
 
 generate_index()
 
-print(f"✅ Build finished — {len(ALL_PAGES)} pages")
+print(f"✅ Build finished — {len(ALL_PAGES)} pages created")

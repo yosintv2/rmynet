@@ -1,71 +1,64 @@
-import os
 from datetime import date
 
-# =========================
-# CONFIG
-# =========================
 SITE_URL = "https://www.reducemyweight.net"
 
 MONTHS = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
+    "January","February","March","April","May","June",
+    "July","August","September","October","November","December"
 ]
 
 START_YEAR = date.today().year
 END_YEAR = START_YEAR + 5
 
-ALL_PAGES = []
+PAGES = []
 
 # =========================
 # PAGE GENERATOR
 # =========================
 def generate_page(month, year):
     slug = f"weight-loss-plan-{month.lower()}-{year}.html"
-
-    ALL_PAGES.append({
-        "month": month,
-        "year": year,
-        "slug": slug
-    })
+    PAGES.append(slug)
 
     html = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <title>{month} {year} Weight Loss Plan</title>
-<meta name="description" content="Best weight loss plan for {month} {year}.">
+<meta name="description" content="Safe and effective weight loss plan for {month} {year}.">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="canonical" href="{SITE_URL}/{slug}">
-<script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body class="bg-gray-100 text-gray-900">
-<div class="max-w-3xl mx-auto p-6">
+<body style="font-family: Arial, sans-serif; background:#f3f4f6; color:#111;">
+<div style="max-width:900px;margin:auto;padding:24px;background:#fff;">
 
-<nav class="mb-6">
-  <a href="/" class="text-blue-600 font-semibold">← Home</a>
+<nav style="margin-bottom:20px;">
+<a href="/" style="color:#2563eb;font-weight:bold;">← Home</a>
 </nav>
 
-<h1 class="text-3xl font-bold mb-4">{month} {year} Weight Loss Plan</h1>
+<h1 style="font-size:32px;margin-bottom:16px;">
+{month} {year} Weight Loss Plan
+</h1>
 
-<p class="mb-4">
-This monthly plan helps you lose weight safely using diet control and workouts.
+<p>
+This monthly plan helps you lose weight safely using calorie control,
+balanced diet, and daily movement.
 </p>
 
-<h2 class="text-xl font-semibold mt-6">Diet Plan</h2>
-<ul class="list-disc ml-6">
-  <li>High-protein foods</li>
-  <li>Low sugar intake</li>
-  <li>Seasonal vegetables</li>
+<h2>Diet Guidelines</h2>
+<ul>
+<li>High protein meals</li>
+<li>Seasonal vegetables</li>
+<li>Reduced sugar intake</li>
 </ul>
 
-<h2 class="text-xl font-semibold mt-6">Workout Plan</h2>
-<ul class="list-disc ml-6">
-  <li>Walking – 30 minutes daily</li>
-  <li>Strength training – 3× per week</li>
+<h2>Workout Guidelines</h2>
+<ul>
+<li>Walking 30 minutes daily</li>
+<li>Strength training 3× weekly</li>
 </ul>
 
-<footer class="mt-10 text-sm text-gray-500">
+<footer style="margin-top:40px;font-size:14px;color:#555;">
 © ReduceMyWeight
 </footer>
 
@@ -83,50 +76,41 @@ This monthly plan helps you lose weight safely using diet control and workouts.
 # INDEX PAGE
 # =========================
 def generate_index():
-    pages_by_year = {}
-
-    for p in ALL_PAGES:
-        pages_by_year.setdefault(p["year"], []).append(p)
-
-    listing = ""
-    for year in sorted(pages_by_year.keys(), reverse=True):
-        listing += f"<h2 class='text-2xl font-bold mt-8'>{year}</h2>"
-        listing += "<div class='grid sm:grid-cols-2 gap-4 mt-4'>"
-
-        for p in pages_by_year[year]:
-            listing += f"""
-            <a href="/{p['slug']}" class="block bg-white p-4 rounded shadow hover:shadow-lg transition">
-              <h3 class="font-semibold">{p['month']} {p['year']} Weight Loss Plan</h3>
-            </a>
-            """
-
-        listing += "</div>"
-
-    index_html = f"""<!DOCTYPE html>
+    html = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <title>Reduce My Weight</title>
-<meta name="description" content="Automated monthly weight loss plans.">
+<meta name="description" content="Monthly automated weight loss plans.">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body class="bg-gray-100 text-gray-900">
-<div class="max-w-5xl mx-auto p-6">
+<body style="font-family:Arial;background:#f3f4f6;">
+<div style="max-width:1000px;margin:auto;padding:24px;background:#fff;">
 
-<header class="mb-10">
-  <h1 class="text-4xl font-bold">Reduce My Weight</h1>
-  <p class="text-gray-600">Monthly Weight Loss Plans</p>
+<h1 style="font-size:36px;">Reduce My Weight</h1>
+<p>Monthly weight loss plans by year</p>
 
-  <nav class="mt-4 space-x-4">
-    <a href="/" class="text-blue-600 font-semibold">Home</a>
-  </nav>
-</header>
+<hr>
+"""
 
-{listing}
+    current_year = None
+    for slug in sorted(PAGES, reverse=True):
+        year = slug.split("-")[-1].replace(".html","")
+        if year != current_year:
+            html += f"<h2 style='margin-top:24px;'>{year}</h2>"
+            current_year = year
 
-<footer class="mt-12 text-sm text-gray-500">
+        html += f"""
+        <p>
+        <a href="/{slug}" style="color:#2563eb;">
+        {slug.replace('-', ' ').replace('.html','').title()}
+        </a>
+        </p>
+        """
+
+    html += """
+<footer style="margin-top:40px;font-size:14px;color:#555;">
 © ReduceMyWeight
 </footer>
 
@@ -136,9 +120,35 @@ def generate_index():
 """
 
     with open("index.html", "w", encoding="utf-8") as f:
-        f.write(index_html)
+        f.write(html)
 
     print("🏠 index.html generated")
+
+# =========================
+# SITEMAP GENERATOR
+# =========================
+def generate_sitemap():
+    urls = [f"{SITE_URL}/{slug}" for slug in PAGES]
+    urls.append(SITE_URL + "/")
+
+    sitemap = '<?xml version="1.0" encoding="UTF-8"?>\n'
+    sitemap += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+
+    for url in urls:
+        sitemap += f"""
+<url>
+  <loc>{url}</loc>
+  <changefreq>monthly</changefreq>
+  <priority>0.8</priority>
+</url>
+"""
+
+    sitemap += "</urlset>"
+
+    with open("sitemap.xml", "w", encoding="utf-8") as f:
+        f.write(sitemap)
+
+    print("🧭 sitemap.xml generated")
 
 # =========================
 # BUILD
@@ -150,5 +160,6 @@ for year in range(START_YEAR, END_YEAR + 1):
         generate_page(month, year)
 
 generate_index()
+generate_sitemap()
 
-print(f"✅ Build finished — {len(ALL_PAGES)} pages created")
+print(f"✅ Build finished — {len(PAGES)} pages")

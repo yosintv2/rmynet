@@ -1,0 +1,36 @@
+name: Auto Build Weight Loss Pages
+
+on:
+  schedule:
+    # Run on the 1st of every month
+    - cron: '0 0 1 * *'
+
+    # Run once every year on Jan 1
+    - cron: '0 0 1 1 *'
+
+  workflow_dispatch:   # Manual run button
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run build script
+        run: |
+          python build.py
+
+      - name: Commit & Push generated pages
+        run: |
+          git config --global user.name "seo-bot"
+          git config --global user.email "seo-bot@users.noreply.github.com"

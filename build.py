@@ -1,165 +1,111 @@
-from datetime import date
+from datetime import datetime
+import calendar
 
 SITE_URL = "https://www.reducemyweight.net"
 
-MONTHS = [
-    "January","February","March","April","May","June",
-    "July","August","September","October","November","December"
-]
+START_YEAR = 2025
+END_YEAR = 2035  # unlimited future (change anytime)
 
-START_YEAR = date.today().year
-END_YEAR = START_YEAR + 5
+def write_file(name, content):
+    with open(name, "w", encoding="utf-8") as f:
+        f.write(content)
 
-PAGES = []
+# ---------------- HOME PAGE ----------------
+index_html = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Reduce My Weight – Monthly Weight Loss Plans</title>
+<meta name="description" content="Monthly weight loss plans, diet guides, and fitness tips updated automatically.">
+<link rel="canonical" href="{SITE_URL}/">
+</head>
+<body>
+<h1>Reduce My Weight</h1>
+<p>Automated monthly weight loss plans.</p>
 
-# =========================
-# PAGE GENERATOR
-# =========================
-def generate_page(month, year):
-    slug = f"weight-loss-plan-{month.lower()}-{year}.html"
-    PAGES.append(slug)
+<ul>
+"""
+
+pages = []
+
+for year in range(START_YEAR, END_YEAR + 1):
+    for month in range(1, 13):
+        month_name = calendar.month_name[month].lower()
+        filename = f"weight-loss-plan-{month_name}-{year}.html"
+        url = f"{SITE_URL}/{filename}"
+        pages.append((filename, url))
+
+        index_html += f'<li><a href="{filename}">{month_name.title()} {year} Weight Loss Plan</a></li>\n'
+
+index_html += """
+</ul>
+</body>
+</html>
+"""
+
+write_file("index.html", index_html)
+
+# ---------------- MONTHLY PAGES ----------------
+for filename, url in pages:
+    title = filename.replace("-", " ").replace(".html", "").title()
 
     html = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>{month} {year} Weight Loss Plan</title>
-<meta name="description" content="Safe and effective weight loss plan for {month} {year}.">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="canonical" href="{SITE_URL}/{slug}">
+<title>{title}</title>
+<meta name="description" content="{title} with diet plan, workout routine, and fat loss tips.">
+<link rel="canonical" href="{url}">
+<script type="application/ld+json">
+{{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "{title}",
+  "author": {{
+    "@type": "Organization",
+    "name": "Reduce My Weight"
+  }},
+  "publisher": {{
+    "@type": "Organization",
+    "name": "Reduce My Weight"
+  }},
+  "mainEntityOfPage": "{url}"
+}}
+</script>
 </head>
+<body>
+<h1>{title}</h1>
 
-<body style="font-family: Arial, sans-serif; background:#f3f4f6; color:#111;">
-<div style="max-width:900px;margin:auto;padding:24px;background:#fff;">
+<h2>Diet Plan</h2>
+<p>High-protein, calorie-controlled meals.</p>
 
-<nav style="margin-bottom:20px;">
-<a href="/" style="color:#2563eb;font-weight:bold;">← Home</a>
-</nav>
+<h2>Workout Plan</h2>
+<p>Cardio + strength training routine.</p>
 
-<h1 style="font-size:32px;margin-bottom:16px;">
-{month} {year} Weight Loss Plan
-</h1>
+<h2>FAQ</h2>
+<h3>Is this plan safe?</h3>
+<p>Yes, it follows healthy weight loss guidelines.</p>
 
-<p>
-This monthly plan helps you lose weight safely using calorie control,
-balanced diet, and daily movement.
-</p>
-
-<h2>Diet Guidelines</h2>
-<ul>
-<li>High protein meals</li>
-<li>Seasonal vegetables</li>
-<li>Reduced sugar intake</li>
-</ul>
-
-<h2>Workout Guidelines</h2>
-<ul>
-<li>Walking 30 minutes daily</li>
-<li>Strength training 3× weekly</li>
-</ul>
-
-<footer style="margin-top:40px;font-size:14px;color:#555;">
-© ReduceMyWeight
-</footer>
-
-</div>
 </body>
 </html>
 """
+    write_file(filename, html)
 
-    with open(slug, "w", encoding="utf-8") as f:
-        f.write(html)
+# ---------------- SITEMAP ----------------
+sitemap = '<?xml version="1.0" encoding="UTF-8"?>\n'
+sitemap += '<urlset xmlns="https://www.sitemaps.org/schemas/sitemap/0.9">\n'
 
-    print(f"📝 Generated: {slug}")
-
-# =========================
-# INDEX PAGE
-# =========================
-def generate_index():
-    html = f"""<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Reduce My Weight</title>
-<meta name="description" content="Monthly automated weight loss plans.">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-</head>
-
-<body style="font-family:Arial;background:#f3f4f6;">
-<div style="max-width:1000px;margin:auto;padding:24px;background:#fff;">
-
-<h1 style="font-size:36px;">Reduce My Weight</h1>
-<p>Monthly weight loss plans by year</p>
-
-<hr>
-"""
-
-    current_year = None
-    for slug in sorted(PAGES, reverse=True):
-        year = slug.split("-")[-1].replace(".html","")
-        if year != current_year:
-            html += f"<h2 style='margin-top:24px;'>{year}</h2>"
-            current_year = year
-
-        html += f"""
-        <p>
-        <a href="/{slug}" style="color:#2563eb;">
-        {slug.replace('-', ' ').replace('.html','').title()}
-        </a>
-        </p>
-        """
-
-    html += """
-<footer style="margin-top:40px;font-size:14px;color:#555;">
-© ReduceMyWeight
-</footer>
-
-</div>
-</body>
-</html>
-"""
-
-    with open("index.html", "w", encoding="utf-8") as f:
-        f.write(html)
-
-    print("🏠 index.html generated")
-
-# =========================
-# SITEMAP GENERATOR
-# =========================
-def generate_sitemap():
-    urls = [f"{SITE_URL}/{slug}" for slug in PAGES]
-    urls.append(SITE_URL + "/")
-
-    sitemap = '<?xml version="1.0" encoding="UTF-8"?>\n'
-    sitemap += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
-
-    for url in urls:
-        sitemap += f"""
-<url>
-  <loc>{url}</loc>
-  <changefreq>monthly</changefreq>
-  <priority>0.8</priority>
+sitemap += f"""<url>
+  <loc>{SITE_URL}/</loc>
 </url>
 """
 
-    sitemap += "</urlset>"
+for _, url in pages:
+    sitemap += f"""<url>
+  <loc>{url}</loc>
+</url>
+"""
 
-    with open("sitemap.xml", "w", encoding="utf-8") as f:
-        f.write(sitemap)
+sitemap += '</urlset>'
 
-    print("🧭 sitemap.xml generated")
-
-# =========================
-# BUILD
-# =========================
-print("🚀 Build started")
-
-for year in range(START_YEAR, END_YEAR + 1):
-    for month in MONTHS:
-        generate_page(month, year)
-
-generate_index()
-generate_sitemap()
-
-print(f"✅ Build finished — {len(PAGES)} pages")
+write_file("sitemap.xml", sitemap)

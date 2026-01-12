@@ -1,36 +1,32 @@
-name: Gold Scraper 2026
+name: Ashesh Gold Scraper
 
 on:
   schedule:
-    - cron: '0 4 * * *'
+    - cron: '0 6 * * *' # Runs at 11:45 AM NST (Daily Gold Update Time)
   workflow_dispatch:
 
 jobs:
-  scrape_job:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository
+      - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup Python
+      - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: '3.9'
 
-      - name: Install Playwright and Dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install playwright
-          # This installs the actual Chromium browser used for scraping
-          playwright install chromium --with-deps 
+      - name: Install Dependencies
+        run: pip install requests beautifulsoup4
 
       - name: Run Scraper
         run: python scrape_gold.py
 
       - name: Commit and Push
         run: |
-          git config --global user.name "GoldBot"
-          git config --global user.email "bot@github.com"
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add data/date.json
-          git commit -m "Update Gold Rates $(date)" || echo "No changes to commit"
+          git commit -m "Update Gold Rates: $(date)" || exit 0
           git push

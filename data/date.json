@@ -1,5 +1,110 @@
-{
-    "full_date_string": "12-Jan-2026",
-    "data": [],
-    "success": false
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Gold Rate JSON Extractor</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; padding: 30px; background: #f4f7f6; }
+        .container { max-width: 850px; margin: auto; background: #fff; padding: 25px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        h2 { color: #2c3e50; margin-top: 0; }
+        .status { padding: 10px; margin-bottom: 20px; border-radius: 5px; font-weight: bold; font-size: 14px; }
+        .loading { background: #e1f5fe; color: #01579b; }
+        .success { background: #e8f5e9; color: #2e7d32; }
+        pre { background: #282c34; color: #abb2bf; padding: 20px; border-radius: 8px; overflow-x: auto; font-size: 14px; }
+        button { background: #2c3e50; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; transition: 0.3s; }
+        button:hover { background: #1a252f; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Market Rates Data</h2>
+    <div id="status" class="status loading">Status: Fetching live rates...</div>
+    
+    <button onclick="fetchData()">Refresh Live Data</button>
+
+    <h3>JSON Output:</h3>
+    <pre id="jsonOutput">Initializing...</pre>
+</div>
+
+<script>
+    async function fetchData() {
+        const status = document.getElementById('status');
+        const output = document.getElementById('jsonOutput');
+        
+        status.innerText = "Status: Updating...";
+        status.className = "status" + " loading";
+
+        // Target URL and CORS Proxy
+        const targetUrl = 'https://www.ashesh.com.np/gold/widget.php';
+        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
+
+        try {
+            const response = await fetch(proxyUrl);
+            const data = await response.json();
+            const htmlString = data.contents;
+
+            // Parse HTML to text
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(htmlString, 'text/html');
+            const lines = doc.body.innerText.split('\n').map(l => l.trim()).filter(l => l !== "");
+
+            const result = {
+                date: "",
+                rates: []
+            };
+
+            // Extract Date
+            const dateMatch = doc.body.innerText.match(/\d{2}-[A-Za-z]+-\d{4}/);
+            if (dateMatch) result.date = dateMatch[0];
+
+            // Extraction Logic
+            for (let i = 0; i < lines.length; i++) {
+                if (lines[i].includes("Gold") || lines[i].includes("Silver")) {
+                    let itemName = lines[i];
+                    
+                    // Handle sub-names like "Fine gold 9999"
+                    if (lines[i+1] && lines[i+1].includes("Fine gold")) {
+                        itemName += " (" + lines[i+1] + ")";
+                        i++;
+                    }
+
+                    let price = null;
+                    let unit = "";
+
+                    // Scan ahead for numeric price and unit label
+                    for (let j = i + 1; j < i + 5 && j < lines.length; j++) {
+                        let clean = lines[j].replace('▶', '').trim();
+                        if (!isNaN(parseFloat(clean)) && price === null) {
+                            price = parseFloat(clean);
+                        } else if (clean.toLowerCase().includes("tola") || clean.toLowerCase().includes("gram")) {
+                            unit = clean;
+                            break; 
+                        }
+                    }
+
+                    if (price) {
+                        result.rates.push({
+                            item: itemName,
+                            unit: unit,
+                            price: price
+                        });
+                    }
+                }
+            }
+
+            output.textContent = JSON.stringify(result, null, 4);
+            status.innerText = "Status: Data updated successfully.";
+            status.className = "status" + " success";
+
+        } catch (err) {
+            status.innerText = "Status: Error connecting to API.";
+            output.textContent = "Error: Could not retrieve data.";
+        }
+    }
+
+    fetchData();
+</script>
+
+</body>
+</html>

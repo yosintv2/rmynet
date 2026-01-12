@@ -2,24 +2,40 @@ import os
 import json
 from datetime import date
 
+# =========================
+# BASIC CONFIG
+# =========================
 SITE_URL = "https://reducemyweight.net"
 OUTPUT_DIR = "output"
 
 MONTHS = [
-    "January","February","March","April","May","June",
-    "July","August","September","October","November","December"
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
 ]
 
 CURRENT_YEAR = date.today().year
-END_YEAR = CURRENT_YEAR + 50  # unlimited scaling
+END_YEAR = CURRENT_YEAR + 5   # increase later safely
 
+# =========================
+# ENSURE OUTPUT DIRECTORY
+# =========================
 os.makedirs(OUTPUT_DIR, exist_ok=True)
+print("✅ Output directory ready")
 
-# ---------- LOAD FAQ DATA ----------
-with open("data/faq.json", "r", encoding="utf-8") as f:
-    FAQS = json.load(f)
+# =========================
+# LOAD FAQ DATA (SAFE)
+# =========================
+FAQS = []
+try:
+    with open("data/faq.json", "r", encoding="utf-8") as f:
+        FAQS = json.load(f)
+    print("✅ FAQ data loaded")
+except FileNotFoundError:
+    print("⚠️ data/faq.json not found — continuing without FAQs")
 
-# ---------- SEASON LOGIC ----------
+# =========================
+# SEASON LOGIC
+# =========================
 def get_season(month):
     if month in ["December", "January", "February"]:
         return "Winter"
@@ -27,19 +43,28 @@ def get_season(month):
         return "Spring"
     elif month in ["June", "July", "August"]:
         return "Summer"
-    else:
-        return "Autumn"
+    return "Autumn"
 
-# ---------- SCHEMA GENERATORS ----------
-def faq_schema(faqs):
-    schema = {
+# =========================
+# HTML PAGE GENERATOR
+# =========================
+def generate_page(month, year):
+    slug = f"weight-loss-plan-{month.lower()}-{year}"
+    filename = f"{OUTPUT_DIR}/{slug}.html"
+    url = f"{SITE_URL}/{slug}.html"
+    season = get_season(month)
+
+    title = f"{month} {year} Weight Loss Plan – Diet, Calories & Workout"
+    description = f"Follow the best {month} {year} weight loss plan with calorie targets, diet tips, and workouts optimized for {season}."
+
+    faq_schema = {
         "@context": "https://schema.org",
         "@type": "FAQPage",
         "mainEntity": []
     }
 
-    for faq in faqs:
-        schema["mainEntity"].append({
+    for faq in FAQS:
+        faq_schema["mainEntity"].append({
             "@type": "Question",
             "name": faq["question"],
             "acceptedAnswer": {
@@ -47,24 +72,6 @@ def faq_schema(faqs):
                 "text": faq["answer"]
             }
         })
-    return json.dumps(schema, indent=2)
-
-def webpage_schema(title, url):
-    return json.dumps({
-        "@context": "https://schema.org",
-        "@type": "WebPage",
-        "name": title,
-        "url": url
-    }, indent=2)
-
-# ---------- PAGE BUILDER ----------
-def build_page(month, year):
-    slug = f"weight-loss-plan-{month.lower()}-{year}"
-    url = f"{SITE_URL}/{slug}.html"
-    season = get_season(month)
-
-    title = f"{month} {year} Weight Loss Plan – Diet, Calories & Workout"
-    description = f"Follow the best {month} {year} weight loss plan with calorie targets, diet tips, workouts, and fat loss strategies updated for this month."
 
     html = f"""<!DOCTYPE html>
 <html lang="en">
@@ -76,58 +83,86 @@ def build_page(month, year):
 <link rel="canonical" href="{url}">
 
 <script type="application/ld+json">
-{webpage_schema(title, url)}
+{json.dumps({
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": title,
+    "url": url
+}, indent=2)}
 </script>
 
 <script type="application/ld+json">
-{faq_schema(FAQS)}
+{json.dumps(faq_schema, indent=2)}
 </script>
-
 </head>
+
 <body>
+<header>
+  <h1>{month} {year} Weight Loss Plan</h1>
+  <p>Optimized for {season} • Updated {year}</p>
+</header>
 
-<h1>{month} {year} Weight Loss Plan</h1>
+<main>
+  <section>
+    <h2>Daily Calorie Target</h2>
+    <p>A daily calorie deficit of <strong>500–700 calories</strong> can help you lose weight safely this month.</p>
+  </section>
 
-<p>This <strong>{month} {year}</strong> weight loss plan is optimized for the <strong>{season}</strong> season and focuses on safe, sustainable fat loss.</p>
+  <section>
+    <h2>Recommended Diet</h2>
+    <ul>
+      <li>High-protein meals</li>
+      <li>Seasonal vegetables</li>
+      <li>Controlled rice portions</li>
+    </ul>
+  </section>
 
-<h2>Daily Calorie Target</h2>
-<p>A healthy calorie deficit of <strong>500–700 calories per day</strong> can help you lose 2–3 kg safely this month.</p>
+  <section>
+    <h2>Workout Plan</h2>
+    <ul>
+      <li>Walking – 30 minutes daily</li>
+      <li>Strength training – 3x per week</li>
+      <li>Stretching & recovery</li>
+    </ul>
+  </section>
 
-<h2>Recommended Diet for {month}</h2>
-<ul>
-  <li>High protein meals</li>
-  <li>Seasonal vegetables</li>
-  <li>Controlled rice portions</li>
-</ul>
-
-<h2>Workout Plan</h2>
-<ul>
-  <li>Walking – 30 minutes daily</li>
-  <li>Bodyweight workouts – 3x/week</li>
-  <li>Stretching and recovery</li>
-</ul>
-
-<h2>Frequently Asked Questions</h2>
-<ul>
+  <section>
+    <h2>FAQs</h2>
+    <ul>
 """
+
     for faq in FAQS:
         html += f"<li><strong>{faq['question']}</strong><br>{faq['answer']}</li>"
 
     html += """
-</ul>
+    </ul>
+  </section>
 
-<p><em>Disclaimer: This plan provides estimates only. Consult a healthcare professional before starting any weight loss program.</em></p>
+  <p><em>Disclaimer: This content is for informational purposes only. Consult a healthcare professional.</em></p>
+</main>
 
+<footer>
+  <p>© ReduceMyWeight.net</p>
+</footer>
 </body>
 </html>
 """
 
-    with open(f"{OUTPUT_DIR}/{slug}.html", "w", encoding="utf-8") as f:
+    with open(filename, "w", encoding="utf-8") as f:
         f.write(html)
 
-# ---------- RUN GENERATOR ----------
-for year in range(CURRENT_YEAR, END_YEAR):
-    for month in MONTHS:
-        build_page(month, year)
+    print(f"📝 Generated: {filename}")
 
-print("✅ Unlimited SEO pages generated successfully.")
+# =========================
+# BUILD ALL PAGES
+# =========================
+page_count = 0
+
+print("🚀 Build started")
+
+for year in range(CURRENT_YEAR, END_YEAR + 1):
+    for month in MONTHS:
+        generate_page(month, year)
+        page_count += 1
+
+print(f"✅ Build finished — {page_count} HTML pages generated")

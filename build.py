@@ -3,9 +3,9 @@ import json
 from datetime import date
 
 # =========================
-# BASIC CONFIG
+# SITE CONFIG (FIXED)
 # =========================
-SITE_URL = "https://reducemyweight.net"
+SITE_URL = "https://yosintv2.github.io/rmynet"
 OUTPUT_DIR = "output"
 
 MONTHS = [
@@ -14,24 +14,24 @@ MONTHS = [
 ]
 
 CURRENT_YEAR = date.today().year
-END_YEAR = CURRENT_YEAR + 5   # increase later safely
+END_YEAR = CURRENT_YEAR + 5  # safe growth
 
 # =========================
-# ENSURE OUTPUT DIRECTORY
+# ENSURE OUTPUT DIR
 # =========================
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 print("✅ Output directory ready")
 
 # =========================
-# LOAD FAQ DATA (SAFE)
+# LOAD FAQ (SAFE)
 # =========================
 FAQS = []
 try:
     with open("data/faq.json", "r", encoding="utf-8") as f:
         FAQS = json.load(f)
-    print("✅ FAQ data loaded")
-except FileNotFoundError:
-    print("⚠️ data/faq.json not found — continuing without FAQs")
+    print("✅ FAQ loaded")
+except Exception as e:
+    print("⚠️ FAQ not loaded:", e)
 
 # =========================
 # SEASON LOGIC
@@ -46,12 +46,12 @@ def get_season(month):
     return "Autumn"
 
 # =========================
-# HTML PAGE GENERATOR
+# PAGE GENERATOR
 # =========================
 def generate_page(month, year):
-    slug = f"weight-loss-plan-{month.lower()}-{year}"
-    filename = f"{OUTPUT_DIR}/{slug}.html"
-    url = f"{SITE_URL}/{slug}.html"
+    slug = f"weight-loss-plan-{month.lower()}-{year}.html"
+    filepath = f"{OUTPUT_DIR}/{slug}"
+    canonical = f"{SITE_URL}/{slug}"
     season = get_season(month)
 
     title = f"{month} {year} Weight Loss Plan – Diet, Calories & Workout"
@@ -66,10 +66,10 @@ def generate_page(month, year):
     for faq in FAQS:
         faq_schema["mainEntity"].append({
             "@type": "Question",
-            "name": faq["question"],
+            "name": faq.get("question", ""),
             "acceptedAnswer": {
                 "@type": "Answer",
-                "text": faq["answer"]
+                "text": faq.get("answer", "")
             }
         })
 
@@ -80,14 +80,14 @@ def generate_page(month, year):
 <title>{title}</title>
 <meta name="description" content="{description}">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="canonical" href="{url}">
+<link rel="canonical" href="{canonical}">
 
 <script type="application/ld+json">
 {json.dumps({
     "@context": "https://schema.org",
     "@type": "WebPage",
     "name": title,
-    "url": url
+    "url": canonical
 }, indent=2)}
 </script>
 
@@ -99,7 +99,7 @@ def generate_page(month, year):
 <body>
 <header>
   <h1>{month} {year} Weight Loss Plan</h1>
-  <p>Optimized for {season} • Updated {year}</p>
+  <p>Season: {season} • Updated {year}</p>
 </header>
 
 <main>
@@ -121,48 +121,48 @@ def generate_page(month, year):
     <h2>Workout Plan</h2>
     <ul>
       <li>Walking – 30 minutes daily</li>
-      <li>Strength training – 3x per week</li>
+      <li>Strength training – 3× per week</li>
       <li>Stretching & recovery</li>
     </ul>
   </section>
 
   <section>
-    <h2>FAQs</h2>
+    <h2>Frequently Asked Questions</h2>
     <ul>
 """
 
     for faq in FAQS:
-        html += f"<li><strong>{faq['question']}</strong><br>{faq['answer']}</li>"
+        html += f"<li><strong>{faq.get('question','')}</strong><br>{faq.get('answer','')}</li>"
 
     html += """
     </ul>
   </section>
 
-  <p><em>Disclaimer: This content is for informational purposes only. Consult a healthcare professional.</em></p>
+  <p><em>Disclaimer: This content is informational only. Consult a healthcare professional before starting any program.</em></p>
 </main>
 
 <footer>
-  <p>© ReduceMyWeight.net</p>
+  <p>© ReduceMyWeight</p>
+  <p><a href="../index.html">Home</a> | <a href="../sitemap.xml">Sitemap</a></p>
 </footer>
 </body>
 </html>
 """
 
-    with open(filename, "w", encoding="utf-8") as f:
+    with open(filepath, "w", encoding="utf-8") as f:
         f.write(html)
 
-    print(f"📝 Generated: {filename}")
+    print(f"📝 Generated: {filepath}")
 
 # =========================
 # BUILD ALL PAGES
 # =========================
-page_count = 0
-
 print("🚀 Build started")
+count = 0
 
 for year in range(CURRENT_YEAR, END_YEAR + 1):
     for month in MONTHS:
         generate_page(month, year)
-        page_count += 1
+        count += 1
 
-print(f"✅ Build finished — {page_count} HTML pages generated")
+print(f"✅ Build finished — {count} pages created")

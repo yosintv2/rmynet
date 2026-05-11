@@ -3639,5 +3639,41 @@
                 "price": 4544.0
             }
         ]
+    },
+    {
+        "date": "11-May-2026",
+        "currency": "NPR",
+        "rates": [
+            {
+                "item": "Gold HallmarkFine gold 9999",
+                "unit": "Tola",
+                "price": 298500.0
+            },
+            {
+                "item": "Gold Tajabi",
+                "unit": "Tola",
+                "price": 295500.0
+            },
+            {
+                "item": "Silver",
+                "unit": "Tola",
+                "price": 5340.0
+            },
+            {
+                "item": "Gold HallmarkFine gold 9999",
+                "unit": "10 gram",
+                "price": 255915.0
+            },
+            {
+                "item": "Gold Tajabi",
+                "unit": "10 gram",
+                "price": 253355.85
+            },
+            {
+                "item": "Silver",
+                "unit": "10 gram",
+                "price": 4578.0
+            }
+        ]
     }
 ]

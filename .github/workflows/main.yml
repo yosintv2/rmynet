@@ -2,8 +2,8 @@ name: Daily Gold Rate Scraper
 
 on:
   schedule:
-- cron: '0 */6 * * *' # Runs every 6 hours (00:00, 06:00, 12:00, 18:00 UTC)
-workflow_dispatch: # Allows manual trigger
+    - cron: '0 */6 * * *' # Runs every 6 hours (00:00, 06:00, 12:00, 18:00 UTC)
+  workflow_dispatch: # Allows manual trigger
 
 jobs:
   build:
@@ -28,5 +28,5 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add gold_rates.json
-          git commit -m "Update gold rates: $(date +'%Y-%m-%d')" || exit 0
+          git commit -m "Update gold rates: $(date +'%Y-%m-%d %H:%M:%S')" || exit 0
           git push
